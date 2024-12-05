@@ -1,10 +1,8 @@
-/*global console */
-
 (function () {
-
     "use strict";
 
     var speedup = false,
+        originalPlaybackRate = 1, // To store the playback speed before an ad starts
         KEYCODES = {
             "SPACEBAR": 32,
             "LEFT": 37,
@@ -39,19 +37,11 @@
         };
 
     function inputActive(currentElement) {
-        // If on an input or textarea
-        if (currentElement.tagName.toLowerCase() === "input" ||
-            currentElement.tagName.toLowerCase() === "textarea" ||
-            currentElement.isContentEditable) {
-            return true;
-        } else {
-            return false;
-        }
+        return ["input", "textarea"].includes(currentElement.tagName.toLowerCase()) || currentElement.isContentEditable;
     }
 
-    // https://stackoverflow.com/questions/6121203/how-to-do-fade-in-and-fade-out-with-javascript-and-css
     function fadeout(element, startOpacity) {
-        var op = startOpacity; // initial opacity
+        var op = startOpacity;
         var timer = setInterval(function () {
             if (op <= 0.1) {
                 clearInterval(timer);
@@ -68,8 +58,6 @@
             HTML = '<div id="' + elementId + '">' + speed + 'x</div>',
             element = document.getElementById(elementId);
 
-        // If the element doesn't exist, append it to the body
-        // must check if it already exists
         if (!element) {
             boundingElement.insertAdjacentHTML('afterbegin', HTML);
             element = document.getElementById(elementId);
@@ -79,11 +67,32 @@
 
         element.style.display = 'block';
         element.style.opacity = 0.8;
-        element.style.filter = 'alpha(opacity=' + (0.8 * 100) + ")"
+        element.style.filter = 'alpha(opacity=' + (0.8 * 100) + ")";
         setTimeout(function () {
             fadeout(element, 0.8);
         }, 1500);
+    }
 
+    function handleAdSpeed(video, mediaElement) {
+        var player = document.getElementById("movie_player");
+
+        // Monitor for ad-related class changes
+        setInterval(() => {
+            if (player && player.classList.contains("ad-showing")) {
+                // Ad detected
+                if (video.playbackRate !== 3) {
+                    originalPlaybackRate = video.playbackRate; // Save current speed
+                    video.playbackRate = 3; // Speed up during ad
+                    displayText("3x (Ad)", mediaElement);
+                }
+            } else {
+                // Ad ended, restore original speed
+                if (video.playbackRate !== originalPlaybackRate) {
+                    video.playbackRate = originalPlaybackRate;
+                    displayText(originalPlaybackRate + "x", mediaElement);
+                }
+            }
+        }, 500); // Check every half-second
     }
 
     window.onkeyup = function (e) {
@@ -95,12 +104,10 @@
             activeElement = document.activeElement,
             i;
 
-        // If an input/textarea element is active, don't go any further 
         if (inputActive(activeElement)) {
             return;
         }
 
-        // Playback speeds
         if (code === KEYCODES.SPEEDUP) {
             speedup = !speedup;
 
@@ -110,7 +117,6 @@
                 video.playbackRate = 1;
             }
 
-            // If ctrl is being pressed turn to x3 speed
             if (ctrlKey) {
                 video.playbackRate = 3;
                 speedup = true;
@@ -119,24 +125,28 @@
             displayText(video.playbackRate, mediaElement);
         }
 
-        // Check if the media element, or any of it's children are active.
-        // Else we'll be overwriting the previous actions.
-        for (i = 0; i < mediaElementChildren.length; i = i + 1) {
+        for (i = 0; i < mediaElementChildren.length; i++) {
             if (mediaElementChildren[i] === activeElement) {
                 return;
             }
         }
 
-        // Also check if it's the media element itself.
         if (mediaElement === activeElement) {
             return;
         }
 
-        // If seek key
         if (SEEK_JUMP_KEYCODE_MAPPINGS[code] !== undefined) {
             video.currentTime = (SEEK_JUMP_KEYCODE_MAPPINGS[code] / 10) * video.duration;
         }
-
     };
+
+    // Initialize the ad speed handler
+    document.addEventListener("DOMContentLoaded", function () {
+        var video = document.getElementsByTagName("video")[0];
+        var mediaElement = document.getElementById("movie_player");
+        if (video && mediaElement) {
+            handleAdSpeed(video, mediaElement);
+        }
+    });
 
 }());
