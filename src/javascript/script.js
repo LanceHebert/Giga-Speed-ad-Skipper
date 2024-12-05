@@ -92,7 +92,7 @@
                     displayText(originalPlaybackRate + "x", mediaElement);
                 }
             }
-        }, 500); // Check every half-second
+        }, 3000); // Check every 3 seconds
     }
 
     window.onkeyup = function (e) {
