@@ -1,14 +1,15 @@
-## YouTube Speed Controls
+## Giga-Speed Youtube ad skipper
 
-**YouTube Speed Controls is a Google Chrome Extension which can be found [here](https://chrome.google.com/webstore/detail/youtube-speed-controls/naalfmaaomhjpbndelnlijacdniggpjn).**
+**Giga-Speed Youtube ad skipper is a Google Chrome Extension 
 
 ## Overview
 
-Click <code>&#96;</code> (the grave accent key) to flick between normal and 2x speed, or <code>ctrl + &#96;</code> to play at 3x speed.
-Control the speed of YouTube videos using the <code>&#96;</code> key.
+Click <code>&#18;</code>(the alt key) to fast forward through youtube ads at giga speed(15x).
 
-Flick between normal (1x), 2x and 3x playback speed.
+Click <code>&#18;</code> (the alt key) to flick between normal, 2x speed and 3x speed during any other time of a video that is non ads.
+
+
 
 ## Usage:
-- Click <code>&#96;</code> (the grave accent key) to flick between normal and 2x playback speed
-- Click <code>ctrl + &#96;</code> to flick between normal and 3x playback speed.
+- Click <code>&#18;</code> (the alt key) to flick between normal, 2x, and 3x playback speed normally.
+- Click <code>&#18;</code>to engage giga speed during in youtube video player ads.

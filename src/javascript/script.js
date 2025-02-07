@@ -9,7 +9,7 @@
             "UP": 38,
             "RIGHT": 39,
             "DOWN": 40,
-            "SPEEDUP": 192
+            "SPEEDUP": 18 // Now using Alt (keycode 18) for speed toggle
         },
         SEEK_JUMP_KEYCODE_MAPPINGS = {
             // 0 to 9
@@ -80,19 +80,17 @@
         setInterval(() => {
             if (player && player.classList.contains("ad-showing")) {
                 // Ad detected
-                if (video.playbackRate !== 3) {
-                    originalPlaybackRate = video.playbackRate; // Save current speed
-                    video.playbackRate = 3; // Speed up during ad
-                    displayText("3x (Ad)", mediaElement);
-                }
+                originalPlaybackRate = video.playbackRate || 1; // Default to 1x if undefined
+                video.playbackRate = 15; // Automatically set ad speed to 15x
+                displayText("15x (Ad)", mediaElement);
+                console.log("Ad detected, speed set to 15x");
             } else {
                 // Ad ended, restore original speed
-                if (video.playbackRate !== originalPlaybackRate) {
-                    video.playbackRate = originalPlaybackRate;
-                    displayText(originalPlaybackRate + "x", mediaElement);
-                }
+                video.playbackRate = originalPlaybackRate; // Restore original speed
+                displayText(originalPlaybackRate + "x", mediaElement);
+                console.log("Ad ended, speed restored to " + originalPlaybackRate + "x");
             }
-        }, 3000); // Check every 3 seconds
+        }, 500); // Check every 5 seconds
     }
 
     window.onkeyup = function (e) {
@@ -109,17 +107,21 @@
         }
 
         if (code === KEYCODES.SPEEDUP) {
-            speedup = !speedup;
+            var player = document.getElementById("movie_player");
 
-            if (speedup) {
-                video.playbackRate = 2;
+            // Check if an ad is showing
+            if (player && player.classList.contains("ad-showing")) {
+                // Keep speed at 15x during the ad
+                video.playbackRate = 15;
             } else {
-                video.playbackRate = 1;
-            }
-
-            if (ctrlKey) {
-                video.playbackRate = 3;
-                speedup = true;
+                // Toggle speed between 1x, 2x, and 3x
+                if (video.playbackRate === 1) {
+                    video.playbackRate = 2;
+                } else if (video.playbackRate === 2) {
+                    video.playbackRate = 3;
+                } else {
+                    video.playbackRate = 1;
+                }
             }
 
             displayText(video.playbackRate, mediaElement);
