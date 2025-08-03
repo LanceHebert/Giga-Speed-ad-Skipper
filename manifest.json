@@ -2,7 +2,7 @@
     "manifest_version": 3,
 
     "name": "Giga-Speed YouTube Ad Skipper",
-    "description": "Automatically speeds up YouTube ads to 15x and provides manual speed controls. Press Alt to toggle speed, Ctrl + Alt for 3x speed.",
+    "description": "Automatically speeds up YouTube ads to 15x and provides manual speed controls. Press Alt to cycle through 1x, 2x, 3x speeds.",
     "version": "1.3",
     
     "content_scripts": [

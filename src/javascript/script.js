@@ -213,23 +213,23 @@
       return;
     }
 
-    // Playback speeds
+    // Playback speeds - cycle through 1x, 2x, 3x
     if (code === KEYCODES.SPEEDUP) {
-      speedup = !speedup;
-
-      if (speedup) {
+      var currentSpeed = video.playbackRate;
+      
+      // Cycle through speeds: 1x → 2x → 3x → 1x
+      if (currentSpeed === 1) {
         video.playbackRate = 2;
         previousSpeed = 2;
-      } else {
-        video.playbackRate = 1;
-        previousSpeed = 1;
-      }
-
-      // If ctrl is being pressed turn to x3 speed
-      if (ctrlKey) {
+        speedup = true;
+      } else if (currentSpeed === 2) {
         video.playbackRate = 3;
         previousSpeed = 3;
         speedup = true;
+      } else {
+        video.playbackRate = 1;
+        previousSpeed = 1;
+        speedup = false;
       }
 
       displayText(video.playbackRate, mediaElement);
