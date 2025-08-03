@@ -260,11 +260,14 @@
       let newSpeed = 1;
 
       // Cycle through speeds: 1x → 2x → 3x → 1x
-      if (currentSpeed === 1) {
+      // Use Math.round to handle floating-point precision issues
+      const roundedSpeed = Math.round(currentSpeed);
+      
+      if (roundedSpeed === 1) {
         newSpeed = 2;
         state.previousSpeed = 2;
         state.speedup = true;
-      } else if (currentSpeed === 2) {
+      } else if (roundedSpeed === 2) {
         newSpeed = 3;
         state.previousSpeed = 3;
         state.speedup = true;
@@ -276,6 +279,7 @@
 
       if (setPlaybackRate(video, newSpeed)) {
         displayText(newSpeed, mediaElement);
+        log(`Speed changed from ${currentSpeed} to ${newSpeed}`);
       }
     }
 
