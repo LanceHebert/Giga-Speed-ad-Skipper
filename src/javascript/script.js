@@ -7,7 +7,7 @@
 
   // Configuration
   const CONFIG = {
-    DEBUG: false, // Set to true for development
+    DEBUG: true, // Set to true for development
     AD_DETECTION_INTERVAL: 2000, // 2 seconds for regular detection
     AD_DETECTION_INTERVAL_ACTIVE: 500, // 0.5 seconds during ads
     VALID_PLAYBACK_RATES: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 3, 15],
