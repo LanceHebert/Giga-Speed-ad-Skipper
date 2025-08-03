@@ -93,28 +93,28 @@
   }
 
   // Ad detection functions
-  function isAdPlaying() {
+  function detectAdPlaying() {
     var video = document.getElementsByTagName("video")[0];
     if (!video) return false;
 
     // Method 1: Check for ad-related classes
     var adIndicators = [
-      '.ytp-ad-player-overlay',
-      '.ytp-ad-skip-button',
-      '.ytp-ad-skip-button-container',
-      '.ytp-ad-overlay-container',
-      '.ytp-ad-text',
-      '.ytp-ad-feedback-dialog-container',
-      '.ytp-ad-skip-button-modest',
-      '.ytp-ad-skip-button-container',
-      '.ytp-ad-skip-button-slot',
-      '.ytp-ad-skip-button-text',
-      '.ytp-ad-skip-button-icon',
-      '.ytp-ad-skip-button-modest',
-      '.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest',
-      '.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest',
-      '.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest',
-      '.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest'
+      ".ytp-ad-player-overlay",
+      ".ytp-ad-skip-button",
+      ".ytp-ad-skip-button-container",
+      ".ytp-ad-overlay-container",
+      ".ytp-ad-text",
+      ".ytp-ad-feedback-dialog-container",
+      ".ytp-ad-skip-button-modest",
+      ".ytp-ad-skip-button-container",
+      ".ytp-ad-skip-button-slot",
+      ".ytp-ad-skip-button-text",
+      ".ytp-ad-skip-button-icon",
+      ".ytp-ad-skip-button-modest",
+      ".ytp-ad-skip-button-modest.ytp-ad-skip-button-modest",
+      ".ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest",
+      ".ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest",
+      ".ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest",
     ];
 
     for (var i = 0; i < adIndicators.length; i++) {
@@ -125,13 +125,13 @@
 
     // Method 2: Check for ad text in page
     var adTexts = [
-      'Skip Ad',
-      'Skip Ads',
-      'Ad',
-      'Advertisement',
-      'Sponsored',
-      'Ad will end in',
-      'Ad will end shortly'
+      "Skip Ad",
+      "Skip Ads",
+      "Ad",
+      "Advertisement",
+      "Sponsored",
+      "Ad will end in",
+      "Ad will end shortly",
     ];
 
     var pageText = document.body.innerText.toLowerCase();
@@ -154,7 +154,7 @@
     var video = document.getElementsByTagName("video")[0];
     if (!video) return;
 
-    var currentlyAdPlaying = isAdPlaying();
+    var currentlyAdPlaying = detectAdPlaying();
 
     if (currentlyAdPlaying && !isAdPlaying) {
       // Ad just started - save current speed and set to 15x
@@ -259,11 +259,11 @@
     if (adDetectionInterval) {
       clearInterval(adDetectionInterval);
     }
-    
-    adDetectionInterval = setInterval(function() {
+
+    adDetectionInterval = setInterval(function () {
       handleAdSpeed();
     }, 1000); // Check every second
-    
+
     console.log("Ad detection started");
   }
 
@@ -277,20 +277,19 @@
   }
 
   // Initialize ad detection when page loads
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startAdDetection);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startAdDetection);
   } else {
     startAdDetection();
   }
 
   // Also start detection when navigating to new videos
   var lastUrl = location.href;
-  new MutationObserver(function() {
+  new MutationObserver(function () {
     var url = location.href;
     if (url !== lastUrl) {
       lastUrl = url;
       setTimeout(startAdDetection, 1000); // Wait a bit for page to load
     }
-  }).observe(document, {subtree: true, childList: true});
-
+  }).observe(document, { subtree: true, childList: true });
 })();
