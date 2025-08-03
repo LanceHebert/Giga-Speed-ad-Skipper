@@ -216,7 +216,7 @@
     // Playback speeds - cycle through 1x, 2x, 3x
     if (code === KEYCODES.SPEEDUP) {
       var currentSpeed = video.playbackRate;
-      
+
       // Cycle through speeds: 1x → 2x → 3x → 1x
       if (currentSpeed === 1) {
         video.playbackRate = 2;
