@@ -1,4 +1,5 @@
 /*global console */
+// Version: 1.3.1 - Fixed ad detection naming conflicts
 
 (function () {
   "use strict";
