@@ -97,7 +97,7 @@
     var video = document.getElementsByTagName("video")[0];
     if (!video) return false;
 
-    // Method 1: Check for ad-related classes
+    // Method 1: Check for ad-related classes (most reliable)
     var adIndicators = [
       ".ytp-ad-player-overlay",
       ".ytp-ad-skip-button",
@@ -106,45 +106,49 @@
       ".ytp-ad-text",
       ".ytp-ad-feedback-dialog-container",
       ".ytp-ad-skip-button-modest",
-      ".ytp-ad-skip-button-container",
       ".ytp-ad-skip-button-slot",
       ".ytp-ad-skip-button-text",
-      ".ytp-ad-skip-button-icon",
-      ".ytp-ad-skip-button-modest",
-      ".ytp-ad-skip-button-modest.ytp-ad-skip-button-modest",
-      ".ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest",
-      ".ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest",
-      ".ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest",
+      ".ytp-ad-skip-button-icon"
     ];
 
     for (var i = 0; i < adIndicators.length; i++) {
       if (document.querySelector(adIndicators[i])) {
+        console.log("Ad detected via DOM element:", adIndicators[i]);
         return true;
       }
     }
 
-    // Method 2: Check for ad text in page
+    // Method 2: Check for specific ad text (more precise)
     var adTexts = [
       "Skip Ad",
       "Skip Ads",
-      "Ad",
-      "Advertisement",
-      "Sponsored",
       "Ad will end in",
-      "Ad will end shortly",
+      "Ad will end shortly"
     ];
 
     var pageText = document.body.innerText.toLowerCase();
     for (var j = 0; j < adTexts.length; j++) {
       if (pageText.includes(adTexts[j].toLowerCase())) {
+        console.log("Ad detected via text:", adTexts[j]);
         return true;
       }
     }
 
-    // Method 3: Check video duration and current time
-    if (video.duration && video.duration < 60 && video.currentTime > 0) {
-      // Short videos (less than 1 minute) that are playing might be ads
+    // Method 3: Check for ad-specific attributes (most reliable)
+    var adElements = document.querySelectorAll('[data-ad-format], [data-ad-slot], .ytp-ad-player-overlay');
+    if (adElements.length > 0) {
+      console.log("Ad detected via ad attributes");
       return true;
+    }
+
+    // Method 4: Check for ad-related URLs in iframes
+    var iframes = document.querySelectorAll('iframe');
+    for (var k = 0; k < iframes.length; k++) {
+      var src = iframes[k].src || '';
+      if (src.includes('doubleclick.net') || src.includes('googlesyndication.com') || src.includes('googleads')) {
+        console.log("Ad detected via iframe URL:", src);
+        return true;
+      }
     }
 
     return false;
@@ -156,13 +160,18 @@
 
     var currentlyAdPlaying = detectAdPlaying();
 
+    // Debug logging
+    if (currentlyAdPlaying !== isAdPlaying) {
+      console.log("Ad state changed - currentlyAdPlaying:", currentlyAdPlaying, "isAdPlaying:", isAdPlaying);
+    }
+
     if (currentlyAdPlaying && !isAdPlaying) {
       // Ad just started - save current speed and set to 15x
       previousSpeed = video.playbackRate;
       video.playbackRate = 15;
       isAdPlaying = true;
       displayText("15x (Ad)", document.getElementById("movie_player"));
-      console.log("Ad detected - speeding up to 15x");
+      console.log("Ad detected - speeding up to 15x, previous speed was:", previousSpeed);
     } else if (!currentlyAdPlaying && isAdPlaying) {
       // Ad just ended - restore previous speed
       video.playbackRate = previousSpeed;
