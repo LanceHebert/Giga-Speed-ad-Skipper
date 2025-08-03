@@ -13,7 +13,7 @@
     VALID_PLAYBACK_RATES: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 3, 15],
     AD_SPEED: 15,
     DISPLAY_DURATION: 1500,
-    FADE_INTERVAL: 50
+    FADE_INTERVAL: 50,
   };
 
   // State management
@@ -25,7 +25,7 @@
     cachedVideo: null,
     cachedMediaElement: null,
     keyTimeout: null,
-    mutationObserver: null
+    mutationObserver: null,
   };
 
   // Key mappings
@@ -35,16 +35,32 @@
     UP: 38,
     RIGHT: 39,
     DOWN: 40,
-    SPEEDUP: 18 // Alt key
+    SPEEDUP: 18, // Alt key
   };
 
   const SEEK_JUMP_KEYCODE_MAPPINGS = {
     // 0 to 9
-    48: 0, 49: 1, 50: 2, 51: 3, 52: 4,
-    53: 5, 54: 6, 55: 7, 56: 8, 57: 9,
+    48: 0,
+    49: 1,
+    50: 2,
+    51: 3,
+    52: 4,
+    53: 5,
+    54: 6,
+    55: 7,
+    56: 8,
+    57: 9,
     // 0 to 9 on numpad
-    96: 0, 97: 1, 98: 2, 99: 3, 100: 4,
-    101: 5, 102: 6, 103: 7, 104: 8, 105: 9
+    96: 0,
+    97: 1,
+    98: 2,
+    99: 3,
+    100: 4,
+    101: 5,
+    102: 6,
+    103: 7,
+    104: 8,
+    105: 9,
   };
 
   // Utility functions
@@ -78,7 +94,7 @@
 
   function inputActive(currentElement) {
     if (!currentElement) return false;
-    
+
     return (
       currentElement.tagName.toLowerCase() === "input" ||
       currentElement.tagName.toLowerCase() === "textarea" ||
@@ -92,7 +108,7 @@
   function createSpeedDisplay(speed) {
     const elementId = "youtube-extension-text-box";
     const element = document.getElementById(elementId);
-    
+
     if (!element) {
       const newElement = document.createElement("div");
       newElement.id = elementId;
@@ -106,7 +122,7 @@
 
   function fadeout(element, startOpacity) {
     if (!element) return;
-    
+
     let opacity = startOpacity;
     const timer = setInterval(function () {
       if (opacity <= 0.1) {
@@ -122,17 +138,17 @@
 
   function displayText(speed, boundingElement) {
     if (!boundingElement) return;
-    
+
     const element = createSpeedDisplay(speed);
-    
+
     if (!document.getElementById(element.id)) {
       boundingElement.insertAdjacentElement("afterbegin", element);
     }
-    
+
     element.style.display = "block";
     element.style.opacity = 0.8;
     element.style.filter = "alpha(opacity=80)";
-    
+
     setTimeout(function () {
       fadeout(element, 0.8);
     }, CONFIG.DISPLAY_DURATION);
@@ -154,7 +170,7 @@
       ".ytp-ad-skip-button-modest",
       ".ytp-ad-skip-button-slot",
       ".ytp-ad-skip-button-text",
-      ".ytp-ad-skip-button-icon"
+      ".ytp-ad-skip-button-icon",
     ];
 
     for (const selector of adIndicators) {
@@ -167,9 +183,9 @@
     // Method 2: Check for specific ad text (more precise)
     const adTexts = [
       "Skip Ad",
-      "Skip Ads", 
+      "Skip Ads",
       "Ad will end in",
-      "Ad will end shortly"
+      "Ad will end shortly",
     ];
 
     const pageText = document.body.innerText.toLowerCase();
@@ -222,7 +238,7 @@
     if (currentlyAdPlaying !== state.adCurrentlyPlaying) {
       log("Ad state changed:", {
         currentlyAdPlaying,
-        adCurrentlyPlaying: state.adCurrentlyPlaying
+        adCurrentlyPlaying: state.adCurrentlyPlaying,
       });
     }
 
@@ -232,7 +248,10 @@
       if (setPlaybackRate(video, CONFIG.AD_SPEED)) {
         state.adCurrentlyPlaying = true;
         displayText(`${CONFIG.AD_SPEED}x (Ad)`, getMediaElement());
-        log("Ad detected - speeding up to 15x, previous speed was:", state.previousSpeed);
+        log(
+          "Ad detected - speeding up to 15x, previous speed was:",
+          state.previousSpeed
+        );
       }
     } else if (!currentlyAdPlaying && state.adCurrentlyPlaying) {
       // Ad just ended - restore previous speed
@@ -262,7 +281,7 @@
       // Cycle through speeds: 1x → 2x → 3x → 1x
       // Use Math.round to handle floating-point precision issues
       const roundedSpeed = Math.round(currentSpeed);
-      
+
       if (roundedSpeed === 1) {
         newSpeed = 2;
         state.previousSpeed = 2;
@@ -285,7 +304,8 @@
 
     // Seek controls
     if (SEEK_JUMP_KEYCODE_MAPPINGS[code] !== undefined) {
-      const seekPosition = (SEEK_JUMP_KEYCODE_MAPPINGS[code] / 10) * video.duration;
+      const seekPosition =
+        (SEEK_JUMP_KEYCODE_MAPPINGS[code] / 10) * video.duration;
       if (seekPosition >= 0 && seekPosition <= video.duration) {
         video.currentTime = seekPosition;
       }
@@ -332,8 +352,8 @@
       clearInterval(state.adDetectionInterval);
     }
 
-    const interval = state.adCurrentlyPlaying 
-      ? CONFIG.AD_DETECTION_INTERVAL_ACTIVE 
+    const interval = state.adCurrentlyPlaying
+      ? CONFIG.AD_DETECTION_INTERVAL_ACTIVE
       : CONFIG.AD_DETECTION_INTERVAL;
 
     state.adDetectionInterval = setInterval(handleAdSpeed, interval);
@@ -377,21 +397,21 @@
         setTimeout(startAdDetection, 1000);
       }
     });
-    
-    state.mutationObserver.observe(document, { 
-      subtree: true, 
-      childList: true 
+
+    state.mutationObserver.observe(document, {
+      subtree: true,
+      childList: true,
     });
   }
 
   // Initialization
   function initialize() {
     log("Initializing Giga-Speed YouTube Ad Skipper v1.4.0");
-    
+
     setupEventListeners();
     setupNavigationDetection();
     startAdDetection();
-    
+
     log("Extension initialized successfully");
   }
 
@@ -409,8 +429,7 @@
       CONFIG,
       detectAdPlaying,
       handleSpeedControl,
-      cleanup
+      cleanup,
     };
   }
-
-})(); 
+})();
