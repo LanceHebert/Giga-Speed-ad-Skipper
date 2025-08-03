@@ -14,7 +14,7 @@
       UP: 38,
       RIGHT: 39,
       DOWN: 40,
-      SPEEDUP: 192,
+      SPEEDUP: 18, // Alt key (18) instead of backtick (192)
     },
     SEEK_JUMP_KEYCODE_MAPPINGS = {
       // 0 to 9

@@ -19,8 +19,8 @@
 4. **Test the Extension**
    - Go to [YouTube](https://youtube.com)
    - Play any video
-   - Press the backtick key (`) to toggle between normal and 2x speed
-   - Press Ctrl + ` for 3x speed
+   - Press the Alt key to toggle between normal and 2x speed
+   - Press Ctrl + Alt for 3x speed
    - Press number keys (0-9) to jump to different parts of the video
 
 ### Firefox
