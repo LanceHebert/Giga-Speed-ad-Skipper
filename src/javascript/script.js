@@ -4,6 +4,9 @@
   "use strict";
 
   var speedup = false,
+    previousSpeed = 1,
+    isAdPlaying = false,
+    adDetectionInterval = null,
     KEYCODES = {
       SPACEBAR: 32,
       LEFT: 37,
@@ -89,6 +92,86 @@
     }, 1500);
   }
 
+  // Ad detection functions
+  function isAdPlaying() {
+    var video = document.getElementsByTagName("video")[0];
+    if (!video) return false;
+
+    // Method 1: Check for ad-related classes
+    var adIndicators = [
+      '.ytp-ad-player-overlay',
+      '.ytp-ad-skip-button',
+      '.ytp-ad-skip-button-container',
+      '.ytp-ad-overlay-container',
+      '.ytp-ad-text',
+      '.ytp-ad-feedback-dialog-container',
+      '.ytp-ad-skip-button-modest',
+      '.ytp-ad-skip-button-container',
+      '.ytp-ad-skip-button-slot',
+      '.ytp-ad-skip-button-text',
+      '.ytp-ad-skip-button-icon',
+      '.ytp-ad-skip-button-modest',
+      '.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest',
+      '.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest',
+      '.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest',
+      '.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest.ytp-ad-skip-button-modest'
+    ];
+
+    for (var i = 0; i < adIndicators.length; i++) {
+      if (document.querySelector(adIndicators[i])) {
+        return true;
+      }
+    }
+
+    // Method 2: Check for ad text in page
+    var adTexts = [
+      'Skip Ad',
+      'Skip Ads',
+      'Ad',
+      'Advertisement',
+      'Sponsored',
+      'Ad will end in',
+      'Ad will end shortly'
+    ];
+
+    var pageText = document.body.innerText.toLowerCase();
+    for (var j = 0; j < adTexts.length; j++) {
+      if (pageText.includes(adTexts[j].toLowerCase())) {
+        return true;
+      }
+    }
+
+    // Method 3: Check video duration and current time
+    if (video.duration && video.duration < 60 && video.currentTime > 0) {
+      // Short videos (less than 1 minute) that are playing might be ads
+      return true;
+    }
+
+    return false;
+  }
+
+  function handleAdSpeed() {
+    var video = document.getElementsByTagName("video")[0];
+    if (!video) return;
+
+    var currentlyAdPlaying = isAdPlaying();
+
+    if (currentlyAdPlaying && !isAdPlaying) {
+      // Ad just started - save current speed and set to 15x
+      previousSpeed = video.playbackRate;
+      video.playbackRate = 15;
+      isAdPlaying = true;
+      displayText("15x (Ad)", document.getElementById("movie_player"));
+      console.log("Ad detected - speeding up to 15x");
+    } else if (!currentlyAdPlaying && isAdPlaying) {
+      // Ad just ended - restore previous speed
+      video.playbackRate = previousSpeed;
+      isAdPlaying = false;
+      displayText(previousSpeed + "x", document.getElementById("movie_player"));
+      console.log("Ad ended - restored speed to " + previousSpeed + "x");
+    }
+  }
+
   function handleSpeedControl(e) {
     var code = e.keyCode,
       ctrlKey = e.ctrlKey,
@@ -112,13 +195,16 @@
 
       if (speedup) {
         video.playbackRate = 2;
+        previousSpeed = 2;
       } else {
         video.playbackRate = 1;
+        previousSpeed = 1;
       }
 
       // If ctrl is being pressed turn to x3 speed
       if (ctrlKey) {
         video.playbackRate = 3;
+        previousSpeed = 3;
         speedup = true;
       }
 
@@ -167,4 +253,44 @@
       console.log("Input element focused:", e.target);
     }
   });
+
+  // Start ad detection monitoring
+  function startAdDetection() {
+    if (adDetectionInterval) {
+      clearInterval(adDetectionInterval);
+    }
+    
+    adDetectionInterval = setInterval(function() {
+      handleAdSpeed();
+    }, 1000); // Check every second
+    
+    console.log("Ad detection started");
+  }
+
+  // Stop ad detection monitoring
+  function stopAdDetection() {
+    if (adDetectionInterval) {
+      clearInterval(adDetectionInterval);
+      adDetectionInterval = null;
+    }
+    console.log("Ad detection stopped");
+  }
+
+  // Initialize ad detection when page loads
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startAdDetection);
+  } else {
+    startAdDetection();
+  }
+
+  // Also start detection when navigating to new videos
+  var lastUrl = location.href;
+  new MutationObserver(function() {
+    var url = location.href;
+    if (url !== lastUrl) {
+      lastUrl = url;
+      setTimeout(startAdDetection, 1000); // Wait a bit for page to load
+    }
+  }).observe(document, {subtree: true, childList: true});
+
 })();
