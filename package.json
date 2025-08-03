@@ -1,0 +1,25 @@
+{
+  "name": "giga-speed-ad-skipper",
+  "version": "1.3.0",
+  "description": "YouTube speed controls and ad skipper extension",
+  "main": "src/javascript/script.js",
+  "scripts": {
+    "dev": "echo 'Extension loaded! Go to chrome://extensions/ and load the unpacked extension from this directory.'",
+    "build": "echo 'No build step needed - this is a simple extension'",
+    "test": "echo 'Test by loading extension in Chrome and visiting YouTube'"
+  },
+  "keywords": [
+    "youtube",
+    "extension",
+    "speed",
+    "ad-skipper",
+    "chrome-extension"
+  ],
+  "author": "Lance Hebert",
+  "license": "MIT",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LanceHebert/Giga-Speed-ad-Skipper.git"
+  }
+} 
